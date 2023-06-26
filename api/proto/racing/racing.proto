@@ -18,6 +18,7 @@ service Racing {
 // Request for ListRaces call.
 message ListRacesRequest {
   ListRacesRequestFilter filter = 1;
+  ListRacesRequestOrderBy order_by = 2;
 }
 
 // Response to ListRaces call.
@@ -29,6 +30,12 @@ message ListRacesResponse {
 message ListRacesRequestFilter {
   repeated int64 meeting_ids = 1;
   bool visible_only = 2;
+}
+
+// Order results by any valid field and direction
+message ListRacesRequestOrderBy {
+  string field = 1;
+  bool desc = 2; // Can treat this as a bool as ASC is the default
 }
 
 /* Resources */
