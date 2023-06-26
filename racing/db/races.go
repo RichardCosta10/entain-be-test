@@ -18,7 +18,7 @@ type RacesRepo interface {
 	Init() error
 
 	// List will return a list of races.
-	List(filter *racing.ListRacesRequestFilter) ([]*racing.Race, error)
+	List(filter *racing.ListRacesRequestFilter, orderBy *racing.ListRacesRequestOrderBy) ([]*racing.Race, error)
 }
 
 type racesRepo struct {
@@ -43,7 +43,7 @@ func (r *racesRepo) Init() error {
 	return err
 }
 
-func (r *racesRepo) List(filter *racing.ListRacesRequestFilter) ([]*racing.Race, error) {
+func (r *racesRepo) List(filter *racing.ListRacesRequestFilter, orderBy *racing.ListRacesRequestOrderBy) ([]*racing.Race, error) {
 	var (
 		err   error
 		query string
@@ -53,6 +53,7 @@ func (r *racesRepo) List(filter *racing.ListRacesRequestFilter) ([]*racing.Race,
 	query = getRaceQueries()[racesList]
 
 	query, args = r.applyFilter(query, filter)
+    query = r.applyOrderBy(query, orderBy)
 
 	rows, err := r.db.Query(query, args...)
 	if err != nil {
@@ -89,6 +90,24 @@ func (r *racesRepo) applyFilter(query string, filter *racing.ListRacesRequestFil
 	}
 
 	return query, args
+}
+
+func (r *racesRepo) applyOrderBy(query string, orderBy *racing.ListRacesRequestOrderBy) (string) {
+	// Check if field is empty as then it doesn't matter if DESC is true
+	if orderBy == nil || orderBy.Field == "" {
+		return query
+	}
+
+	// It is possible to order by multiple fields if field is like "column1, column2, column3" etc, in which case only the last column will be sorted descendingly
+	// As an alternative, could split orderBy.Field by comma and then loop, or receive orderBy.Field as an array of strings in the first place
+	// but I'm treating this question as the intention is to order by a single field
+	query += " ORDER BY " + orderBy.Field
+
+	if (orderBy.Desc) {
+		query += " DESC"
+	}
+
+	return query
 }
 
 func (m *racesRepo) scanRaces(
