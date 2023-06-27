@@ -2,6 +2,7 @@ package db
 
 const (
 	racesList = "list"
+	racesGetById = "get"
 )
 
 func getRaceQueries() map[string]string {
@@ -17,5 +18,16 @@ func getRaceQueries() map[string]string {
 				status 
 			FROM races
 		`,
+		racesGetById: `
+			SELECT
+				id,
+				meeting_id,
+				name,
+				number,
+				visible,
+				advertised_start_time,
+				status
+				FROM races WHERE id = ?
+			`,
 	}
 }

@@ -11,6 +11,10 @@ service Racing {
   rpc ListRaces(ListRacesRequest) returns (ListRacesResponse) {
     option (google.api.http) = { post: "/v1/list-races", body: "*" };
   }
+
+  rpc GetRace(GetRaceRequest) returns (GetRaceResponse) {
+    option (google.api.http) = { get: "/v1/races/{id}"};
+  }
 }
 
 /* Requests/Responses */
@@ -36,6 +40,14 @@ message ListRacesRequestFilter {
 message ListRacesRequestOrderBy {
   string field = 1;
   bool desc = 2; // Can treat this as a bool as ASC is the default
+}
+
+message GetRaceRequest {
+  int64 id = 1;
+}
+
+message GetRaceResponse {
+  Race race = 1;
 }
 
 /* Resources */
